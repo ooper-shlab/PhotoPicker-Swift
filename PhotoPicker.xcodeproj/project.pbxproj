@@ -27,16 +27,10 @@
 		284EAAA417467372002CEFCB /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		284EAAA817467372002CEFCB /* PhotoPicker-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "PhotoPicker-Info.plist"; sourceTree = "<group>"; };
 		284EAAAA17467372002CEFCB /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		284EAAAC17467372002CEFCB /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		284EAAAE17467372002CEFCB /* PhotoPicker-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PhotoPicker-Prefix.pch"; sourceTree = "<group>"; };
-		284EAAAF17467372002CEFCB /* APLAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APLAppDelegate.h; sourceTree = "<group>"; };
-		284EAAB017467372002CEFCB /* APLAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APLAppDelegate.m; sourceTree = "<group>"; };
 		284EAAB217467372002CEFCB /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
 		284EAAB417467372002CEFCB /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		284EAAB617467372002CEFCB /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		284EAAB917467372002CEFCB /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/MainStoryboard.storyboard; sourceTree = "<group>"; };
-		284EAABB17467372002CEFCB /* APLViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APLViewController.h; sourceTree = "<group>"; };
-		284EAABC17467372002CEFCB /* APLViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APLViewController.m; sourceTree = "<group>"; };
 		28A709B8174C02C5003E42E3 /* ReadMe.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ReadMe.txt; sourceTree = "<group>"; };
 		28DED20C1748C1CD00C382D5 /* OverlayView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = OverlayView.xib; sourceTree = "<group>"; };
 		D7DDE9ED1C38712300C815F3 /* APLViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = APLViewController.swift; sourceTree = "<group>"; };
@@ -92,11 +86,7 @@
 			children = (
 				284EAAB817467372002CEFCB /* MainStoryboard.storyboard */,
 				28DED20C1748C1CD00C382D5 /* OverlayView.xib */,
-				284EAABB17467372002CEFCB /* APLViewController.h */,
-				284EAABC17467372002CEFCB /* APLViewController.m */,
 				D7DDE9ED1C38712300C815F3 /* APLViewController.swift */,
-				284EAAAF17467372002CEFCB /* APLAppDelegate.h */,
-				284EAAB017467372002CEFCB /* APLAppDelegate.m */,
 				D7DDE9EF1C38797300C815F3 /* APLAppDelegate.swift */,
 				284EAAA717467372002CEFCB /* Supporting Files */,
 			);
@@ -108,8 +98,6 @@
 			children = (
 				284EAAA817467372002CEFCB /* PhotoPicker-Info.plist */,
 				284EAAA917467372002CEFCB /* InfoPlist.strings */,
-				284EAAAC17467372002CEFCB /* main.m */,
-				284EAAAE17467372002CEFCB /* PhotoPicker-Prefix.pch */,
 				284EAAB217467372002CEFCB /* Default.png */,
 				284EAAB417467372002CEFCB /* Default@2x.png */,
 				284EAAB617467372002CEFCB /* Default-568h@2x.png */,

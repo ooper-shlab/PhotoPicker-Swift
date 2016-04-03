@@ -158,7 +158,7 @@ class APLViewController : UIViewController, UINavigationControllerDelegate, UIIm
         self.startStopButton.enabled = false
         
         let fireDate = NSDate(timeIntervalSinceNow: 5.0)
-        let cameraTimer = NSTimer(fireDate:fireDate, interval: 1.0, target: self, selector: "timedPhotoFire:", userInfo: nil, repeats: false)
+        let cameraTimer = NSTimer(fireDate:fireDate, interval: 1.0, target: self, selector: #selector(APLViewController.timedPhotoFire(_:)), userInfo: nil, repeats: false)
         
         NSRunLoop.mainRunLoop().addTimer(cameraTimer, forMode: NSDefaultRunLoopMode)
         self.cameraTimer = cameraTimer;
@@ -175,13 +175,13 @@ class APLViewController : UIViewController, UINavigationControllerDelegate, UIIm
         In low memory situations sometimes our "didReceiveMemoryWarning" method will be called in which case we can recover some memory and keep the app running.
         */
         self.startStopButton.title = NSLocalizedString("Stop", comment: "Title for overlay view controller start/stop button")
-        self.startStopButton.action = "stopTakingPicturesAtIntervals:"
+        self.startStopButton.action = #selector(APLViewController.stopTakingPicturesAtIntervals(_:))
         
         self.doneButton.enabled = false
         self.delayedPhotoButton.enabled = false
         self.takePictureButton.enabled = false
         
-        self.cameraTimer = NSTimer.scheduledTimerWithTimeInterval(1.5, target: self, selector: "timedPhotoFire:", userInfo: nil, repeats: true)
+        self.cameraTimer = NSTimer.scheduledTimerWithTimeInterval(1.5, target: self, selector: #selector(APLViewController.timedPhotoFire(_:)), userInfo: nil, repeats: true)
         self.cameraTimer!.fire() // Start taking pictures right away.
     }
     
