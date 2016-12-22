@@ -71,7 +71,7 @@ class APLViewController : UIViewController, UINavigationControllerDelegate, UIIm
     
     var imagePickerController: UIImagePickerController?
     
-    /*###weak*/ var cameraTimer: NSTimer?
+    /*###weak*/ var cameraTimer: Timer?
     var capturedImages: [UIImage] = []
     
     
@@ -81,27 +81,27 @@ class APLViewController : UIViewController, UINavigationControllerDelegate, UIIm
         
         self.capturedImages = []
         
-        if !UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.Camera) {
+        if !UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.camera) {
             // There is not a camera on this device, so don't show the camera button.
             var toolbarItems = self.toolBar.items
-            toolbarItems?.removeAtIndex(2)
+            toolbarItems?.remove(at: 2)
             self.toolBar.setItems(toolbarItems, animated: false)
         }
     }
     
     
     @IBAction func showImagePickerForCamera(_: AnyObject) {
-        self.showImagePickerForSourceType(UIImagePickerControllerSourceType.Camera)
+        self.showImagePickerForSourceType(UIImagePickerControllerSourceType.camera)
     }
     
     
     @IBAction func showImagePickerForPhotoPicker(_: AnyObject) {
-        self.showImagePickerForSourceType(UIImagePickerControllerSourceType.PhotoLibrary)
+        self.showImagePickerForSourceType(UIImagePickerControllerSourceType.photoLibrary)
     }
     
     
-    private func showImagePickerForSourceType(sourceType: UIImagePickerControllerSourceType) {
-        if self.imageView.isAnimating() {
+    fileprivate func showImagePickerForSourceType(_ sourceType: UIImagePickerControllerSourceType) {
+        if self.imageView.isAnimating {
             self.imageView.stopAnimating()
         }
         
@@ -110,11 +110,11 @@ class APLViewController : UIViewController, UINavigationControllerDelegate, UIIm
         }
         
         let imagePickerController = UIImagePickerController()
-        imagePickerController.modalPresentationStyle = .CurrentContext
+        imagePickerController.modalPresentationStyle = .currentContext
         imagePickerController.sourceType = sourceType
         imagePickerController.delegate = self
         
-        if sourceType == .Camera {
+        if sourceType == .camera {
             /*
             The user wants to use the camera interface. Set up our custom overlay view for the camera.
             */
@@ -123,14 +123,14 @@ class APLViewController : UIViewController, UINavigationControllerDelegate, UIIm
             /*
             Load the overlay view from the OverlayView nib file. Self is the File's Owner for the nib file, so the overlayView outlet is set to the main view in the nib. Pass that view to the image picker controller to use as its overlay view, and set self's reference to the view to nil.
             */
-            NSBundle.mainBundle().loadNibNamed("OverlayView", owner: self, options: nil)
+            Bundle.main.loadNibNamed("OverlayView", owner: self, options: nil)
             self.overlayView.frame = imagePickerController.cameraOverlayView!.frame
             imagePickerController.cameraOverlayView = self.overlayView;
             self.overlayView = nil;
         }
         
         self.imagePickerController = imagePickerController
-        self.presentViewController(imagePickerController, animated: true, completion: nil)
+        self.present(imagePickerController, animated: true, completion: nil)
     }
     
     
@@ -138,7 +138,7 @@ class APLViewController : UIViewController, UINavigationControllerDelegate, UIIm
     
     @IBAction func done(_: AnyObject) {
         // Dismiss the camera.
-        if self.cameraTimer?.valid ?? false {
+        if self.cameraTimer?.isValid ?? false {
             self.cameraTimer!.invalidate()
         }
         self.finishAndUpdate()
@@ -152,15 +152,15 @@ class APLViewController : UIViewController, UINavigationControllerDelegate, UIIm
     
     @IBAction func delayedTakePhoto(_: AnyObject) {
         // These controls can't be used until the photo has been taken
-        self.doneButton.enabled = false
-        self.takePictureButton.enabled = false
-        self.delayedPhotoButton.enabled = false
-        self.startStopButton.enabled = false
+        self.doneButton.isEnabled = false
+        self.takePictureButton.isEnabled = false
+        self.delayedPhotoButton.isEnabled = false
+        self.startStopButton.isEnabled = false
         
-        let fireDate = NSDate(timeIntervalSinceNow: 5.0)
-        let cameraTimer = NSTimer(fireDate:fireDate, interval: 1.0, target: self, selector: #selector(APLViewController.timedPhotoFire(_:)), userInfo: nil, repeats: false)
+        let fireDate = Date(timeIntervalSinceNow: 5.0)
+        let cameraTimer = Timer(fireAt:fireDate, interval: 1.0, target: self, selector: #selector(APLViewController.timedPhotoFire(_:)), userInfo: nil, repeats: false)
         
-        NSRunLoop.mainRunLoop().addTimer(cameraTimer, forMode: NSDefaultRunLoopMode)
+        RunLoop.main.add(cameraTimer, forMode: RunLoopMode.defaultRunLoopMode)
         self.cameraTimer = cameraTimer;
     }
     
@@ -177,11 +177,11 @@ class APLViewController : UIViewController, UINavigationControllerDelegate, UIIm
         self.startStopButton.title = NSLocalizedString("Stop", comment: "Title for overlay view controller start/stop button")
         self.startStopButton.action = #selector(APLViewController.stopTakingPicturesAtIntervals(_:))
         
-        self.doneButton.enabled = false
-        self.delayedPhotoButton.enabled = false
-        self.takePictureButton.enabled = false
+        self.doneButton.isEnabled = false
+        self.delayedPhotoButton.isEnabled = false
+        self.takePictureButton.isEnabled = false
         
-        self.cameraTimer = NSTimer.scheduledTimerWithTimeInterval(1.5, target: self, selector: #selector(APLViewController.timedPhotoFire(_:)), userInfo: nil, repeats: true)
+        self.cameraTimer = Timer.scheduledTimer(timeInterval: 1.5, target: self, selector: #selector(APLViewController.timedPhotoFire(_:)), userInfo: nil, repeats: true)
         self.cameraTimer!.fire() // Start taking pictures right away.
     }
     
@@ -195,8 +195,8 @@ class APLViewController : UIViewController, UINavigationControllerDelegate, UIIm
     }
     
     
-    private func finishAndUpdate() {
-        self.dismissViewControllerAnimated(true, completion: nil)
+    fileprivate func finishAndUpdate() {
+        self.dismiss(animated: true, completion: nil)
             
         if self.capturedImages.count > 0 {
             if self.capturedImages.count == 1 {
@@ -221,7 +221,7 @@ class APLViewController : UIViewController, UINavigationControllerDelegate, UIIm
     //MARK: - Timer
     
     // Called by the timer to take a picture.
-    @objc func timedPhotoFire(timer: NSTimer) {
+    @objc func timedPhotoFire(_ timer: Timer) {
         self.imagePickerController?.takePicture()
     }
     
@@ -229,12 +229,12 @@ class APLViewController : UIViewController, UINavigationControllerDelegate, UIIm
     //MARK: - UIImagePickerControllerDelegate
     
     // This method is called when an image has been chosen from the library or taken from the camera.
-    func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         let image = info[UIImagePickerControllerOriginalImage]! as! UIImage
         
         self.capturedImages.append(image)
         
-        if self.cameraTimer?.valid ?? false {
+        if self.cameraTimer?.isValid ?? false {
             return
         }
         
@@ -242,8 +242,8 @@ class APLViewController : UIViewController, UINavigationControllerDelegate, UIIm
     }
     
     
-    func imagePickerControllerDidCancel(picker: UIImagePickerController) {
-        self.dismissViewControllerAnimated(false/*true*/, completion: nil)
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        self.dismiss(animated: false/*true*/, completion: nil)
     }
     
     
