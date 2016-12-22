@@ -1,23 +1,18 @@
-# PhotoPicker
+# PhotoPicker - Using UIImagePickerController to Select Pictures and Take Photos
 
-Translated by OOPer in cooperation with shlab.jp, on 2016/1/3.
+This sample demonstrates how to choose images from the photo library, take a picture using the device's camera, and how to customize the look of the camera's user interface.  This is done by using UIImagePickerController.  The chosen image or camera photo is displayed in a UIImageView.
+To customize the camera's interface, this sample shows how to use an overlay view.  With this overlay view it gives you the ability to customize the UI as you take a picture.
 
-Based on
-<https://developer.apple.com/library/ios/samplecode/PhotoPicker/Introduction/Intro.html#//apple_ref/doc/uid/DTS40010196>
-2013-05-29.
+Among the custom features of the camera is to take a single picture, timed picture, or repeated pictures like a camera with a fast shutter speed.  Timed and shutter speed camera shots are done using the NSTimer class.
 
-As this is a line-by-line translation from the original sample code, "redistribute the Apple Software in its entirety and without modifications" would apply. See license terms in each file .
-Some faults caused by my translation may exist. Not all features tested.
-You should not contact to Apple or SHLab(jp) about any faults caused by my translation.
 
-===========================================================================
-BUILD REQUIREMENTS:
+## Build Requirements
 
-Xcode 8.2.1, iOS SDK 10
+iOS 10.x SDK or later
 
-===========================================================================
-RUNTIME REQUIREMENTS:
+## Runtime Requirements
 
-iOS 8.0 or later.
+iOS 9.0 or later
 
-===========================================================================
+
+Copyright (C) 2010-2016 Apple Inc. All rights reserved.

@@ -1,58 +1,16 @@
 /*
-     File: APLViewController.m
- Abstract: Main view controller for the application.
-  Version: 2.0
+ Copyright (C) 2016 Apple Inc. All Rights Reserved.
+ See LICENSE.txt for this sample’s licensing information
  
- Disclaimer: IMPORTANT:  This Apple software is supplied to you by Apple
- Inc. ("Apple") in consideration of your agreement to the following
- terms, and your use, installation, modification or redistribution of
- this Apple software constitutes acceptance of these terms.  If you do
- not agree with these terms, please do not use, install, modify or
- redistribute this Apple software.
- 
- In consideration of your agreement to abide by the following terms, and
- subject to these terms, Apple grants you a personal, non-exclusive
- license, under Apple's copyrights in this original Apple software (the
- "Apple Software"), to use, reproduce, modify and redistribute the Apple
- Software, with or without modifications, in source and/or binary forms;
- provided that if you redistribute the Apple Software in its entirety and
- without modifications, you must retain this notice and the following
- text and disclaimers in all such redistributions of the Apple Software.
- Neither the name, trademarks, service marks or logos of Apple Inc. may
- be used to endorse or promote products derived from the Apple Software
- without specific prior written permission from Apple.  Except as
- expressly stated in this notice, no other rights or licenses, express or
- implied, are granted by Apple herein, including but not limited to any
- patent rights that may be infringed by your derivative works or by other
- works in which the Apple Software may be incorporated.
- 
- The Apple Software is provided by Apple on an "AS IS" basis.  APPLE
- MAKES NO WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION
- THE IMPLIED WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY AND FITNESS
- FOR A PARTICULAR PURPOSE, REGARDING THE APPLE SOFTWARE OR ITS USE AND
- OPERATION ALONE OR IN COMBINATION WITH YOUR PRODUCTS.
- 
- IN NO EVENT SHALL APPLE BE LIABLE FOR ANY SPECIAL, INDIRECT, INCIDENTAL
- OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- INTERRUPTION) ARISING IN ANY WAY OUT OF THE USE, REPRODUCTION,
- MODIFICATION AND/OR DISTRIBUTION OF THE APPLE SOFTWARE, HOWEVER CAUSED
- AND WHETHER UNDER THEORY OF CONTRACT, TORT (INCLUDING NEGLIGENCE),
- STRICT LIABILITY OR OTHERWISE, EVEN IF APPLE HAS BEEN ADVISED OF THE
- POSSIBILITY OF SUCH DAMAGE.
- 
- Copyright (C) 2013 Apple Inc. All Rights Reserved.
- 
+ Abstract:
+ Main view controller for the application.
  */
 
 #import "APLViewController.h"
 
-
-@interface APLViewController ()
+@interface APLViewController () <UINavigationControllerDelegate, UIImagePickerControllerDelegate>
 
 @property (nonatomic, weak) IBOutlet UIImageView *imageView;
-
-@property (nonatomic, weak) IBOutlet UIToolbar *toolBar;
 
 @property (nonatomic) IBOutlet UIView *overlayView;
 @property (nonatomic, weak) IBOutlet UIBarButtonItem *takePictureButton;
@@ -68,39 +26,74 @@
 @end
 
 
+#pragma mark -
 
 @implementation APLViewController
-
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     
     self.capturedImages = [[NSMutableArray alloc] init];
+}
 
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    
     if (![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera])
     {
         // There is not a camera on this device, so don't show the camera button.
-        NSMutableArray *toolbarItems = [self.toolBar.items mutableCopy];
-        [toolbarItems removeObjectAtIndex:2];
-        [self.toolBar setItems:toolbarItems animated:NO];
+        UIToolbar *toolbar = self.navigationController.toolbar;
+        NSMutableArray *toolbarItems = [toolbar.items mutableCopy];
+        if (toolbarItems.count > 2)
+        {
+            [toolbarItems removeObjectAtIndex:2];
+            [self setToolbarItems:toolbarItems animated:NO];
+        }
     }
 }
 
-
 - (IBAction)showImagePickerForCamera:(id)sender
 {
-    [self showImagePickerForSourceType:UIImagePickerControllerSourceTypeCamera];
+    AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+    if (authStatus == AVAuthorizationStatusDenied)
+    {
+        // Denies access to camera, alert the user.
+        // The user has previously denied access. Remind the user that we need camera access to be useful.
+        UIAlertController *alertController =
+        [UIAlertController alertControllerWithTitle:@"Unable to access the Camera"
+                                            message:@"To enable access, go to Settings > Privacy > Camera and turn on Camera access for this app."
+                                     preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil];
+        [alertController addAction:ok];
+        
+        [self presentViewController:alertController animated:YES completion:nil];
+    }
+    else if (authStatus == AVAuthorizationStatusNotDetermined)
+        // The user has not yet been presented with the option to grant access to the camera hardware.
+        // Ask for it.
+        [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo completionHandler:^( BOOL granted ) {
+            // If access was denied, we do not set the setup error message since access was just denied.
+            if (granted)
+            {
+                // Allowed access to camera, go ahead and present the UIImagePickerController.
+                [self showImagePickerForSourceType:UIImagePickerControllerSourceTypeCamera fromButton:sender];
+            }
+        }];
+    else
+    {
+        // Allowed access to camera, go ahead and present the UIImagePickerController.
+        [self showImagePickerForSourceType:UIImagePickerControllerSourceTypeCamera fromButton:sender];
+    }
 }
-
 
 - (IBAction)showImagePickerForPhotoPicker:(id)sender
 {
-    [self showImagePickerForSourceType:UIImagePickerControllerSourceTypePhotoLibrary];
+    [self showImagePickerForSourceType:UIImagePickerControllerSourceTypePhotoLibrary fromButton:sender];
 }
 
-
-- (void)showImagePickerForSourceType:(UIImagePickerControllerSourceType)sourceType
+- (void)showImagePickerForSourceType:(UIImagePickerControllerSourceType)sourceType fromButton:(UIBarButtonItem *)button
 {
     if (self.imageView.isAnimating)
     {
@@ -116,12 +109,16 @@
     imagePickerController.modalPresentationStyle = UIModalPresentationCurrentContext;
     imagePickerController.sourceType = sourceType;
     imagePickerController.delegate = self;
+    imagePickerController.modalPresentationStyle =
+        (sourceType == UIImagePickerControllerSourceTypeCamera) ? UIModalPresentationFullScreen : UIModalPresentationPopover;
+    
+    UIPopoverPresentationController *presentationController = imagePickerController.popoverPresentationController;
+    presentationController.barButtonItem = button;  // display popover from the UIBarButtonItem as an anchor
+    presentationController.permittedArrowDirections = UIPopoverArrowDirectionAny;
     
     if (sourceType == UIImagePickerControllerSourceTypeCamera)
     {
-        /*
-         The user wants to use the camera interface. Set up our custom overlay view for the camera.
-         */
+        // The user wants to use the camera interface. Set up our custom overlay view for the camera.
         imagePickerController.showsCameraControls = NO;
 
         /*
@@ -133,8 +130,11 @@
         self.overlayView = nil;
     }
 
-    self.imagePickerController = imagePickerController;
-    [self presentViewController:self.imagePickerController animated:YES completion:nil];
+    _imagePickerController = imagePickerController; // we need this for later
+
+    [self presentViewController:self.imagePickerController animated:YES completion:^{
+        //.. done presenting
+    }];
 }
 
 
@@ -150,12 +150,10 @@
     [self finishAndUpdate];
 }
 
-
 - (IBAction)takePhoto:(id)sender
 {
     [self.imagePickerController takePicture];
 }
-
 
 - (IBAction)delayedTakePhoto:(id)sender
 {
@@ -171,7 +169,6 @@
     [[NSRunLoop mainRunLoop] addTimer:cameraTimer forMode:NSDefaultRunLoopMode];
     self.cameraTimer = cameraTimer;
 }
-
 
 - (IBAction)startTakingPicturesAtIntervals:(id)sender
 {
@@ -194,7 +191,6 @@
     [self.cameraTimer fire]; // Start taking pictures right away.
 }
 
-
 - (IBAction)stopTakingPicturesAtIntervals:(id)sender
 {
     // Stop and reset the timer.
@@ -204,10 +200,10 @@
     [self finishAndUpdate];
 }
 
-
 - (void)finishAndUpdate
 {
-    [self dismissViewControllerAnimated:YES completion:NULL];
+    // Dismiss the image picker.
+    [self dismissViewControllerAnimated:YES completion:nil];
 
     if ([self.capturedImages count] > 0)
     {
@@ -229,7 +225,7 @@
         [self.capturedImages removeAllObjects];
     }
 
-    self.imagePickerController = nil;
+    _imagePickerController = nil;
 }
 
 
@@ -248,7 +244,6 @@
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
 {
     UIImage *image = [info valueForKey:UIImagePickerControllerOriginalImage];
-
     [self.capturedImages addObject:image];
 
     if ([self.cameraTimer isValid])
@@ -259,12 +254,12 @@
     [self finishAndUpdate];
 }
 
-
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
 {
-    [self dismissViewControllerAnimated:YES completion:NULL];
+    [self dismissViewControllerAnimated:YES completion:^{
+        //.. done dismissing
+    }];
 }
-
 
 @end
 
