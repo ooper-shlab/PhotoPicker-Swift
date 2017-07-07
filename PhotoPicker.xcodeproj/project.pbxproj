@@ -108,7 +108,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = APL;
-				LastUpgradeCheck = 0810;
+				LastUpgradeCheck = 0830;
 				ORGANIZATIONNAME = "Apple Inc.";
 				TargetAttributes = {
 					284EAA9C17467372002CEFCB = {
@@ -282,6 +282,7 @@
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				RUN_CLANG_STATIC_ANALYZER = NO;
 				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
